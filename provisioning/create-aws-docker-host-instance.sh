@@ -6,8 +6,7 @@ INSTANCE_DIR="ec2_instance"
 
 export AMI_IMAGE_ID="ami-1a962263"
 
-echo No instance information present, continuing.
-[ -d "${INSTANCE_DIR}" ] || mkdir ${INSTANCE_DIR}
+ 
 
 USERNAME=$(aws iam get-user --query 'User.UserName' --output text)
 
@@ -58,4 +57,5 @@ echo Using CIDR ${MY_CIDR} for access restrictions.
 set +e
 aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 22 --cidr ${MY_CIDR}
 aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 80 --cidr ${MY_CIDR}
+aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 8080 --cidr ${MY_CIDR}
 
