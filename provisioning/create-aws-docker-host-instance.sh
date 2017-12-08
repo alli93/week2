@@ -41,13 +41,14 @@ if [ ! -e ./ec2_instance/instance-id.txt ]; then
     echo Waiting for instance to be running
     echo aws ec2 wait --region eu-west-1 instance-running --instance-ids ${INSTANCE_ID}
     aws ec2 wait --region eu-west-1 instance-running --instance-ids ${INSTANCE_ID}
-    echo EC2 instance ${INSTANCE_ID} ready and available on ${INSTANCE_PUBLIC_NAME}
 fi
 
 if [ ! -e ./ec2_instance/instance-public-name.txt ]; then
     export INSTANCE_PUBLIC_NAME=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query "Reservations[*].Instances[*].PublicDnsName" --output=text)
     echo ${INSTANCE_PUBLIC_NAME} > ./ec2_instance/instance-public-name.txt
+    echo EC2 instance ${INSTANCE_ID} ready and available on ${INSTANCE_PUBLIC_NAME}
 fi
+
 
 
 MY_CIDR=${MY_PUBLIC_IP}/32
@@ -58,4 +59,7 @@ set +e
 aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 22 --cidr ${MY_CIDR}
 aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 80 --cidr ${MY_CIDR}
 aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 8080 --cidr ${MY_CIDR}
+# Github ip range for the Jenkins pipeline
+aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 8080 --cidr 192.30.252.0/22
+aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP_NAME} --protocol tcp --port 8080 --cidr 185.199.108.0/22
 
